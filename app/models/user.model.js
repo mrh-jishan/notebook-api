@@ -15,7 +15,7 @@ const UserSchema = mongoose.Schema({
     }
 }, {
     timestamps: true,
-    toJSON: { virtuals: true } 
+    // toJSON: { virtuals: true } 
 });
 
 UserSchema.virtual('notes', {
