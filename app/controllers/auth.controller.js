@@ -54,7 +54,32 @@ const login = (req, res) => {
     });
 }
 
+
+const me = (req, res) => {
+
+    User.findById(req.user.id).populate('notes').lean().exec((err, user) => {
+        if (err) {
+            if (err.kind === 'ObjectId') {
+                return res.status(404).send({
+                    message: "User not found with id " + req.params.userId
+                });
+            }
+            return res.status(500).send({
+                message: "Error retrieving user with id " + req.params.userId
+            });
+        }
+
+        if (!user) {
+            return res.status(404).send({
+                message: "User not found with id " + req.params.userId
+            });
+        }
+        return res.status(200).json(user)
+    });
+}
+
 module.exports = {
     login,
-    register
+    register,
+    me
 }

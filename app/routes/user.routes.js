@@ -1,5 +1,9 @@
 module.exports = (app) => {
     const users = require('../controllers/user.controller');
+    const authController = require('./../controllers/auth.controller');
+    const authService = require('./../service/auth.service');
+
+    app.get('/api/v1/me', authService.verifyAccessToken, authController.me);
 
     // Create a new User
     app.post('/users', users.create);
