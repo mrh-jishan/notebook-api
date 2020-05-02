@@ -1,10 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
+const cors = require('cors');
 require('dotenv').config();
 
 // create express app
 const app = express();
+
+// cros origin 
+app.use(cors())
 
 // HTTP request logger middleware for node.js
 app.use(logger('combined'));
