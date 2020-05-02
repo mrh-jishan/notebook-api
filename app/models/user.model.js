@@ -20,6 +20,7 @@ const UserSchema = mongoose.Schema({
     password: {
         type: String,
         required: true,
+        select: false
     },
     mobile: {
         type: String,
@@ -32,6 +33,13 @@ const UserSchema = mongoose.Schema({
 
 UserSchema.virtual('notes', {
     ref: 'Note',
+    localField: '_id',
+    foreignField: 'userId', // 'any id in the foreign table'
+    justOne: false // set true for one-to-one relationship
+})
+
+UserSchema.virtual('todos', {
+    ref: 'Todo',
     localField: '_id',
     foreignField: 'userId', // 'any id in the foreign table'
     justOne: false // set true for one-to-one relationship

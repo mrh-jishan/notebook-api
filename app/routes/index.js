@@ -4,6 +4,8 @@ module.exports = (app) => {
         res.json({ "message": "Welcome to EasyNotes application. Take notes quickly. Organize and keep track of all your notes." });
     });
     require('./auth.routes')(app);
+    require('./todo.routes')(app);
+
     require('./note.routes')(app);
     require('./user.routes')(app);
 }

@@ -10,31 +10,31 @@ const authToken = (user) => {
     return { access_token, refresh_token }
 }
 
-const verifyAccessToken = (req, res, next)=> {
+const verifyAccessToken = (req, res, next) => {
     try {
         var payload = jwt.verify(req.headers.token, access_key);
         req.user = {
             id: payload.id
         }
         next()
-      } catch(err) {
-          console.log("error", err);
-          
+    } catch (err) {
+        console.log("error", err);
+
         res.status(500).json(err);
-      }
+    }
 }
 
-const verifyRefreshToken = (req, res, next)=> {
+const verifyRefreshToken = (req, res, next) => {
     try {
         var payload = jwt.verify(req.headers.token, refresh_key);
-        res.locals.auth = req.payload.email;  
-        console.log('payload: ',payload);
+        res.locals.auth = req.payload.email;
+        console.log('payload: ', payload);
         next()
-      } catch(err) {
-          console.log('errir', err);
-          
+    } catch (err) {
+        console.log('errir', err);
+
         res.status(500).json(err);
-      }
+    }
 }
 
 const hashSync = (password) => {
