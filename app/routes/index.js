@@ -1,12 +1,24 @@
+'use strict';
+
+const responseHandler = require('./../middlewares/responseHandler');
+const routes = require('./routes');
+
 
 module.exports = (app) => {
-    app.get('/', (req, res) => {
-        res.json({ "message": "Welcome to EasyNotes application. Take notes quickly. Organize and keep track of all your notes." });
-    });
-    require('./auth.routes')(app);
-    require('./todo.routes')(app);
 
-    require('./note.routes')(app);
-    require('./user.routes')(app);
+    app.get('/', (req, res) => {
+        res.status(200).json({ "message": "Welcome to EasyNotes application. Take notes quickly." });
+    });
+
+    // public
+    app.use('/api/v1', routes, responseHandler)
+
+  
+    app.use('*', function (req, res, next) {
+        console.log("NO ROUTE MATCH");
+        next({ err: 'NO_API_FOUND' });
+    });
+
+    return app;
 }
 

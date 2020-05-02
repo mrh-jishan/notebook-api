@@ -1,14 +1,12 @@
 const User = require('../models/user.model');
 const authService = require('./../service/auth.service');
 
-const register = (req, res) => {
+const register = (req, res, next) => {
 
     User.findOne({ email: req.body.email }).exec((err, user) => {
 
         if (user) {
-            return res.status(500).json({
-                message: "Sorry! The user already exist"
-            });
+            next({ err: 'Sorry! The user already exist' })
         }
 
         new User({
@@ -19,46 +17,46 @@ const register = (req, res) => {
             mobile: req.body.mobile
         }).save()
             .then(data => {
-                res.status(200).json(data);
+                res.body = {
+                    data: data
+                }
+                next();
             }).catch(err => {
-                res.status(500).json({
-                    message: err.message || "Some error occurred while creating the user."
-                });
+                next({ err: err.message || 'Some error occurred while creating the user.' })
             });
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
 
     User.findOne({ email: req.body.email })
         .select('+password')
         .exec((err, user) => {
             if (!user) {
-                console.log('user not found');
-                return res.status(500).send({
-                    message: "Sorry! Authentication Failed."
-                });
+                next({ err: 'Sorry! Authentication Failed.' })
             }
 
             const isPasswordValid = authService.compareSync(req.body.password, user.password);
 
             if (isPasswordValid) {
-                return res.status(200).json({
-                    user: user,
-                    token: authService.authToken(user),
-                })
+                const token = authService.authToken(user);
+                res.body = {
+                    data: {
+                        user: user,
+                        token: token,
+                    }
+                }
+                next();
+
             } else {
-                console.log('password missmatch');
-                return res.status(500).send({
-                    message: "Sorry! Authentication Failed."
-                });
+                next({ err: 'Sorry! Authentication Failed.' })
             }
         });
 }
 
 
-const me = (req, res) => {
-
+const me = (req, res, next) => {
+    
     User.findById(req.user.id)
         .populate('notes')
         .populate('todos')
@@ -66,21 +64,20 @@ const me = (req, res) => {
         .exec((err, user) => {
             if (err) {
                 if (err.kind === 'ObjectId') {
-                    return res.status(404).send({
-                        message: "User not found with id " + req.params.userId
-                    });
+                    next({ err: 'User not found with id' + req.params.userId })
                 }
-                return res.status(500).send({
-                    message: "Error retrieving user with id " + req.params.userId
-                });
+                next({ err: 'Error retrieving user with id ' + req.params.userId })
             }
 
             if (!user) {
-                return res.status(404).send({
-                    message: "User not found with id " + req.params.userId
-                });
+                next({ err: 'User not found with id' + req.params.userId })
             }
-            return res.status(200).json(user)
+            res.body = {
+                data: {
+                    user: user
+                }
+            }
+            next();
         });
 }
 
