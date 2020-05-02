@@ -2,18 +2,11 @@ const Note = require('../models/note.model');
 
 // Create and Save a new Note
 exports.create = (req, res) => {
-    // Validate request
-    if (!req.body.content) {
-        return res.status(400).send({
-            message: "Note content can not be empty"
-        });
-    }
-
     // Create a Note
     const note = new Note({
         title: req.body.title || "Untitled Note",
         content: req.body.content,
-        userId: req.body.userId
+        userId: req.user.id
     });
 
     // Save Note in the database
@@ -29,7 +22,7 @@ exports.create = (req, res) => {
 
 // Retrieve and return all notes from the database.
 exports.findAll = (req, res) => {
-    Note.find()
+    Note.find({ userId: req.user.id })
         .then(notes => {
             res.send(notes);
         }).catch(err => {
