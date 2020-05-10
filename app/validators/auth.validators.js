@@ -7,7 +7,7 @@ const loginValidator = (req, res, next) => {
     }).validate(req.body);
 
     if (error) {
-        return res.status(400).json(error)
+        next({ err: error })
     }
     next();
 }
@@ -25,7 +25,7 @@ const registerValidator = (req, res, next) => {
     }).validate(req.body);
 
     if (error) {
-        return res.status(400).json(error)
+        next({ err: error })
     }
     next();
 }
