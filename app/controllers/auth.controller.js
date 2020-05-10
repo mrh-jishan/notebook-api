@@ -7,23 +7,17 @@ const register = (req, res, next) => {
 
         if (user) {
             next({ err: 'Sorry! The user already exist' })
+            return;
         }
 
-        new User({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            password: authService.hashSync(req.body.password),
-            mobile: req.body.mobile
-        }).save()
-            .then(data => {
-                res.body = {
-                    data: data
-                }
-                next();
-            }).catch(err => {
-                next({ err: err.message || 'Some error occurred while creating the user.' })
-            });
+        new User(req.body).save().then(data => {
+            res.body = {
+                data: data
+            }
+            next();
+        }).catch(err => {
+            next({ err: err.message || 'Some error occurred while creating the user.' })
+        });
     });
 };
 
@@ -34,29 +28,29 @@ const login = (req, res, next) => {
         .exec((err, user) => {
             if (!user) {
                 next({ err: 'Sorry! Authentication Failed.' })
+                return;
             }
 
-            const isPasswordValid = authService.compareSync(req.body.password, user.password);
+            user.comparePassword(req.body.password, function (err, isMatch) {
+            
+                if (err || !isMatch) {
+                    next({ err: 'Sorry! Authentication Failed.' })
+                    return;
+                };
 
-            if (isPasswordValid) {
-                const token = authService.authToken(user);
                 res.body = {
                     data: {
                         user: user,
-                        token: token,
+                        token: authService.authToken(user),
                     }
                 }
                 next();
-
-            } else {
-                next({ err: 'Sorry! Authentication Failed.' })
-            }
+            });
         });
-}
-
+};
 
 const me = (req, res, next) => {
-    
+
     User.findById(req.user.id)
         .populate('notes')
         .populate('todos')

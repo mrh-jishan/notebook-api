@@ -1,6 +1,4 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const salt = bcrypt.genSaltSync(10);
 const access_key = process.env.JWT_ACCESS_KEY;
 const refresh_key = process.env.JWT_REFRESH_KEY;
 
@@ -37,18 +35,9 @@ const verifyRefreshToken = (req, res, next) => {
     }
 }
 
-const hashSync = (password) => {
-    return bcrypt.hashSync(password, salt);
-}
-
-const compareSync = (password, hash) => {
-    return bcrypt.compareSync(password, hash);
-}
 
 module.exports = {
     authToken,
-    hashSync,
-    compareSync,
     verifyAccessToken,
     verifyRefreshToken
 }
